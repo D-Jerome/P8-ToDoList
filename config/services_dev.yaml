@@ -1,0 +1,3 @@
+parameters:
+
+    cache_type: file_system
