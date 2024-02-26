@@ -4,8 +4,8 @@ namespace App\Controller;
 
 use App\Entity\Task;
 use App\Form\TaskType;
+use Doctrine\ORM\EntityManager;
 use App\Repository\TaskRepository;
-use Doctrine\Persistence\ManagerRegistry;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -19,7 +19,7 @@ class TaskController extends AbstractController
     }
 
     #[Route(path: '/tasks/create', name: 'task_create')]
-    public function create(Request $request, ManagerRegistry $managerRegistry)
+    public function create(Request $request, EntityManager $em)
     {
         $task = new Task();
         $form = $this->createForm(TaskType::class, $task);
@@ -27,8 +27,6 @@ class TaskController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $em = $managerRegistry->getManager();
-
             $em->persist($task);
             $em->flush();
 
@@ -41,14 +39,14 @@ class TaskController extends AbstractController
     }
 
     #[Route(path: '/tasks/{id}/edit', name: 'task_edit')]
-    public function edit(Task $task, Request $request, ManagerRegistry $managerRegistry)
+    public function edit(Task $task, Request $request, EntityManager $em)
     {
         $form = $this->createForm(TaskType::class, $task);
 
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $managerRegistry->getManager()->flush();
+            $em->flush();
 
             $this->addFlash('success', 'La tâche a bien été modifiée.');
 
@@ -62,10 +60,10 @@ class TaskController extends AbstractController
     }
 
     #[Route(path: '/tasks/{id}/toggle', name: 'task_toggle')]
-    public function toggleTask(Task $task, ManagerRegistry $managerRegistry)
+    public function toggleTask(Task $task, EntityManager $em)
     {
         $task->toggle(!$task->isDone());
-        $managerRegistry->getManager()->flush();
+        $em->flush();
 
         $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()));
 
@@ -73,9 +71,8 @@ class TaskController extends AbstractController
     }
 
     #[Route(path: '/tasks/{id}/delete', name: 'task_delete')]
-    public function deleteTask(Task $task, ManagerRegistry $managerRegistry)
+    public function deleteTask(Task $task, EntityManager $em)
     {
-        $em = $managerRegistry->getManager();
         $em->remove($task);
         $em->flush();
 
