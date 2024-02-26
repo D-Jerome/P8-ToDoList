@@ -81,6 +81,18 @@
             "src/Kernel.php"
         ]
     },
+    "symfony/mailer": {
+        "version": "5.4",
+        "recipe": {
+            "repo": "github.com/symfony/recipes",
+            "branch": "main",
+            "version": "4.3",
+            "ref": "df66ee1f226c46f01e85c29c2f7acce0596ba35a"
+        },
+        "files": [
+            "config/packages/mailer.yaml"
+        ]
+    },
     "symfony/monolog-bundle": {
         "version": "3.10",
         "recipe": {
@@ -131,20 +143,6 @@
         },
         "files": [
             "config/packages/security.yaml"
-        ]
-    },
-    "symfony/swiftmailer-bundle": {
-        "version": "3.5",
-        "recipe": {
-            "repo": "github.com/symfony/recipes",
-            "branch": "main",
-            "version": "2.5",
-            "ref": "f0b2fccdca2dfd97dc2fd5ad216d5e27c4f895ac"
-        },
-        "files": [
-            "config/packages/dev/swiftmailer.yaml",
-            "config/packages/swiftmailer.yaml",
-            "config/packages/test/swiftmailer.yaml"
         ]
     },
     "symfony/translation": {
