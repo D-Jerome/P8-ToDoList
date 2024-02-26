@@ -17,7 +17,6 @@
         "doctrine/doctrine-bundle": "^2.7",
         "doctrine/migrations": "^3.7",
         "doctrine/orm": "^2.5",
-        "sensio/framework-extra-bundle": "^6.2",
         "symfony/asset": "^6.0",
         "symfony/cache": "^6.0",
         "symfony/dotenv": "^6.0",
