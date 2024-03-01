@@ -1,16 +1,17 @@
 <?php
 
+declare(strict_types=1);
+
 namespace App\Controller;
 
 use App\Entity\User;
 use App\Form\UserType;
-use Doctrine\ORM\EntityManager;
 use App\Repository\UserRepository;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Routing\Annotation\Route;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
-
+use Symfony\Component\Routing\Annotation\Route;
 
 class UserController extends AbstractController
 {
@@ -21,7 +22,7 @@ class UserController extends AbstractController
     }
 
     #[Route(path: '/users/create', name: 'user_create')]
-    public function create(Request $request , UserPasswordHasherInterface $hasher, EntityManager $em)
+    public function create(Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $em)
     {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
@@ -44,7 +45,7 @@ class UserController extends AbstractController
     }
 
     #[Route(path: '/users/{id}/edit', name: 'user_edit')]
-    public function edit(User $user, Request $request , UserPasswordHasherInterface $hasher, EntityManager $em)
+    public function edit(User $user, Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $em)
     {
         $form = $this->createForm(UserType::class, $user);
 
