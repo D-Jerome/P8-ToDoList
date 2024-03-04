@@ -4,6 +4,8 @@ declare(strict_types=1);
 
 namespace App\Tests\Functionnal\Controller;
 
+
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Profiler\Profile;
@@ -23,4 +25,14 @@ class UsersPageTest extends WebTestCase
 
     }
 
+    public function testShowEditUserPage():void
+    {
+        $client = self::createClient();
+
+        $client->request(Request::METHOD_GET, '/users/1/edit');
+
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+
+
+    }
 }

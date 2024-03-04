@@ -5,18 +5,23 @@ declare(strict_types=1);
 namespace App\Tests\Functionnal;
 
 use Generator;
+
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
 
 class loginTest extends WebTestCase
 {
+
+
     public function testShouldAuthenticate():void
     {
         $client = self::createClient();
-
+        
         $client->request(Request::METHOD_GET, '/login');
 
         $client->submitForm('Se connecter', self::createFormData());
@@ -67,7 +72,6 @@ class loginTest extends WebTestCase
     public function testShouldShowErrors(array $formData):void
     {
         $client = self::createClient();
-
         $client->request(Request::METHOD_GET, '/login');
 
         $client->submitForm('Se connecter',$formData);
@@ -91,4 +95,67 @@ class loginTest extends WebTestCase
 
     }
 
+    public function testLogoutPageWithUserConnected(): void
+    {
+        $client = self::createClient();
+        
+        $client->request(Request::METHOD_GET, '/login');
+
+        $client->submitForm('Se connecter', self::createFormData());
+
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
+
+        $client->enableProfiler();
+
+        if (($profile = $client->getProfile()) instanceof Profile) {
+            /** @var SecurityDataCollector $securityCollector */
+            $securityCollector = $profile->getCollector('security');
+            self::assertTrue($securityCollector->isAuthenticated());
+        }
+
+        $client->followRedirect();
+
+        self::assertResponseIsSuccessful();
+        // dd($client->getResponse()->getContent());
+        self::assertRouteSame('homepage');
+
+        $client->request(Request::METHOD_GET, '/logout');
+
+        $client->followRedirect();
+
+        self::assertRouteSame('homepage');
+    }
+    
+    
+    public function testLogout(): void
+    {
+        $client = self::createClient();
+        
+        $client->request(Request::METHOD_GET, '/login');
+
+        $client->submitForm('Se connecter', self::createFormData());
+
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
+
+        $client->enableProfiler();
+
+        if (($profile = $client->getProfile()) instanceof Profile) {
+            /** @var SecurityDataCollector $securityCollector */
+            $securityCollector = $profile->getCollector('security');
+            self::assertTrue($securityCollector->isAuthenticated());
+        }
+
+        $client->followRedirect();
+
+        self::assertResponseIsSuccessful();
+        // dd($client->getResponse()->getContent());
+        self::assertRouteSame('homepage');
+
+        $client->clickLink('Se déconnecter');
+
+        $client->followRedirect();
+
+
+        self::assertRouteSame('homepage');
+    }
 }

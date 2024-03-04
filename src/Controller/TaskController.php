@@ -7,7 +7,7 @@ namespace App\Controller;
 use App\Entity\Task;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
-use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
@@ -21,7 +21,7 @@ class TaskController extends AbstractController
     }
 
     #[Route(path: '/tasks/create', name: 'task_create')]
-    public function create(Request $request, EntityManager $em)
+    public function create(Request $request, EntityManagerInterface $em)
     {
         $task = new Task();
         $form = $this->createForm(TaskType::class, $task);
@@ -41,7 +41,7 @@ class TaskController extends AbstractController
     }
 
     #[Route(path: '/tasks/{id}/edit', name: 'task_edit')]
-    public function edit(Task $task, Request $request, EntityManager $em)
+    public function edit(Task $task, Request $request, EntityManagerInterface $em)
     {
         $form = $this->createForm(TaskType::class, $task);
 
@@ -62,7 +62,7 @@ class TaskController extends AbstractController
     }
 
     #[Route(path: '/tasks/{id}/toggle', name: 'task_toggle')]
-    public function toggleTask(Task $task, EntityManager $em)
+    public function toggleTask(Task $task, EntityManagerInterface $em)
     {
         $task->toggle(!$task->isDone());
         $em->flush();
@@ -73,7 +73,7 @@ class TaskController extends AbstractController
     }
 
     #[Route(path: '/tasks/{id}/delete', name: 'task_delete')]
-    public function deleteTask(Task $task, EntityManager $em)
+    public function deleteTask(Task $task, EntityManagerInterface $em)
     {
         $em->remove($task);
         $em->flush();

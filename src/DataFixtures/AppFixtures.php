@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\DataFixtures;
 
+use App\Entity\Task;
 use App\Entity\User;
 use Doctrine\Bundle\FixturesBundle\Fixture;
 use Doctrine\Persistence\ObjectManager;
@@ -27,6 +28,19 @@ class AppFixtures extends Fixture
         $user->setEmail('test@email.com');
         $manager->persist($user);
 
+        for ($i = 1; $i <= 5; ++$i) {
+            $task = new Task();
+            $task->setTitle("test {$i}");
+            $task->setContent("content {$i}");
+            $task->toggle(true);
+            $manager->persist($task);
+        }
+        for ($i = 6; $i <= 10; ++$i) {
+            $task = new Task();
+            $task->setTitle("test {$i}");
+            $task->setContent("content {$i}");
+            $manager->persist($task);
+        }
         $manager->flush();
     }
 }

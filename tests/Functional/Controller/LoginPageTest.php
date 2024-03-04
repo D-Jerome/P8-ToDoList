@@ -19,7 +19,6 @@ class LoginPageTest extends WebTestCase
         $client->request(Request::METHOD_GET, '/login');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
-
     }
 
 }
