@@ -23,11 +23,11 @@ doctrine:
                 prefix: 'App\Entity'
                 alias: App
 
-when@test:
-    doctrine:
-        dbal:
-            # "TEST_TOKEN" is typically set by ParaTest
-            dbname_suffix: '_test%env(default::TEST_TOKEN)%'
+# when@test:
+#     doctrine:
+#         dbal:
+#             # "TEST_TOKEN" is typically set by ParaTest
+#             url: 'mysql://symfony:Sym70ny!@127.0.0.1:33061/todotest?serverVersion=8.0.35&charset=utf8mb4'
 
 when@prod:
     doctrine:
