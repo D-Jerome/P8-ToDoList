@@ -5,23 +5,28 @@ declare(strict_types=1);
 namespace App\Controller;
 
 use App\Entity\Task;
+use App\Entity\User;
 use App\Form\TaskType;
 use App\Repository\TaskRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\CurrentUser;
 
 class TaskController extends AbstractController
 {
     #[Route(path: '/tasks', name: 'task_list')]
-    public function list(TaskRepository $taskRepository)
+    public function list(TaskRepository $taskRepository, #[CurrentUser] User $connectedUser,)
     {
-        return $this->render('task/list.html.twig', ['tasks' => $taskRepository->findAll()]);
+        return $this->render('task/list.html.twig', ['tasks' => $taskRepository->findBy(['user' => $connectedUser])]);
     }
 
     #[Route(path: '/tasks/create', name: 'task_create')]
-    public function create(Request $request, EntityManagerInterface $em)
+    public function create(
+        Request $request,
+        EntityManagerInterface $em,
+        #[CurrentUser] User $connectedUser, )
     {
         $task = new Task();
         $form = $this->createForm(TaskType::class, $task);
@@ -29,6 +34,7 @@ class TaskController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
+            $task->setUser($connectedUser);
             $em->persist($task);
             $em->flush();
 

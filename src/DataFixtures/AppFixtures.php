@@ -32,6 +32,7 @@ class AppFixtures extends Fixture
             $task = new Task();
             $task->setTitle("test {$i}");
             $task->setContent("content {$i}");
+            $task->setUser($user);
             $task->toggle(true);
             $manager->persist($task);
         }
@@ -39,6 +40,7 @@ class AppFixtures extends Fixture
             $task = new Task();
             $task->setTitle("test {$i}");
             $task->setContent("content {$i}");
+            $task->setUser($user);
             $manager->persist($task);
         }
         $manager->flush();
