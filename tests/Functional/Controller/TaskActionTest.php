@@ -15,6 +15,15 @@ use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
 class TaskActionTest extends WebTestCase
 {
 
+    private KernelBrowser|null $client = null;
+
+    public function setUp() : void
+ 
+  {
+    $this->client = static::createClient();
+  }
+    
+
     /**
      * Undocumented function
      *
@@ -46,27 +55,27 @@ class TaskActionTest extends WebTestCase
 
     public function testToggleTask(): void
     {
-        $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/login');
+        // $this->client = self::createClient();
+        $this->client->request(Request::METHOD_GET, '/login');
 
-        $client->submitForm('Se connecter', self::userFormData());
+        $this->client->submitForm('Se connecter', self::userFormData());
 
-        $client->enableProfiler();
+        $this->client->enableProfiler();
 
-        if (($profile = $client->getProfile()) instanceof Profile) {
+        if (($profile = $this->client->getProfile()) instanceof Profile) {
             /** @var SecurityDataCollector $securityCollector */
             $securityCollector = $profile->getCollector('security');
             self::assertTrue($securityCollector->isAuthenticated());
         }
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
-        $client->clickLink('Consulter la liste des tâches à faire');
+        $this->client->clickLink('Consulter la liste des tâches à faire');
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
-        // dd($client->getResponse()->getContent());
-        $client->request(Request::METHOD_GET, '/tasks/1/toggle');
+        // dd($this->client->getResponse()->getContent());
+        $this->client->request(Request::METHOD_GET, '/tasks/1/toggle');
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
         self::assertResponseIsSuccessful();
          
@@ -75,7 +84,7 @@ class TaskActionTest extends WebTestCase
          /**
          * @var TaskRepository $taskRepository
          */
-        $taskRepository = $client->getContainer()->get(TaskRepository::class);
+        $taskRepository = $this->client->getContainer()->get(TaskRepository::class);
         
         /** @var Task|null $task */
         $task = $taskRepository->find('1');
@@ -84,9 +93,9 @@ class TaskActionTest extends WebTestCase
         self::assertEquals(false, $task->isDone());
 
 
-        $client->request(Request::METHOD_GET, '/tasks/1/toggle');
+        $this->client->request(Request::METHOD_GET, '/tasks/1/toggle');
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
         self::assertResponseIsSuccessful();
          
@@ -95,7 +104,7 @@ class TaskActionTest extends WebTestCase
         /**
          * @var TaskRepository $taskRepository
          */
-        $taskRepository = $client->getContainer()->get(TaskRepository::class);
+        $taskRepository = $this->client->getContainer()->get(TaskRepository::class);
         
         /** @var Task|null $task */
         $task = $taskRepository->find('1');
@@ -106,27 +115,27 @@ class TaskActionTest extends WebTestCase
 
     public function testDeleteTask(): void
     {
-        $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/login');
+        // $this->client = self::createClient();
+        $this->client->request(Request::METHOD_GET, '/login');
 
-        $client->submitForm('Se connecter', self::userFormData());
+        $this->client->submitForm('Se connecter', self::userFormData());
 
-        $client->enableProfiler();
+        $this->client->enableProfiler();
 
-        if (($profile = $client->getProfile()) instanceof Profile) {
+        if (($profile = $this->client->getProfile()) instanceof Profile) {
             /** @var SecurityDataCollector $securityCollector */
             $securityCollector = $profile->getCollector('security');
             self::assertTrue($securityCollector->isAuthenticated());
         }
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
-        $client->clickLink('Consulter la liste des tâches à faire');
+        $this->client->clickLink('Consulter la liste des tâches à faire');
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
-        // dd($client->getResponse()->getContent());
-        $client->request(Request::METHOD_GET, '/tasks/1/delete');
+        // dd($this->client->getResponse()->getContent());
+        $this->client->request(Request::METHOD_GET, '/tasks/1/delete');
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
         self::assertResponseIsSuccessful();
          
@@ -135,7 +144,7 @@ class TaskActionTest extends WebTestCase
          /**
          * @var TaskRepository $taskRepository
          */
-        $taskRepository = $client->getContainer()->get(TaskRepository::class);
+        $taskRepository = $this->client->getContainer()->get(TaskRepository::class);
         
         /** @var Task|null $task */
         $task = $taskRepository->find('1');
@@ -146,42 +155,42 @@ class TaskActionTest extends WebTestCase
 
     public function testEditTask(): void
     {
-        $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/login');
+        // $this->client = self::createClient();
+        $this->client->request(Request::METHOD_GET, '/login');
 
-        $client->submitForm('Se connecter', self::userFormData());
+        $this->client->submitForm('Se connecter', self::userFormData());
 
-        $client->enableProfiler();
+        $this->client->enableProfiler();
 
-        if (($profile = $client->getProfile()) instanceof Profile) {
+        if (($profile = $this->client->getProfile()) instanceof Profile) {
             /** @var SecurityDataCollector $securityCollector */
             $securityCollector = $profile->getCollector('security');
             self::assertTrue($securityCollector->isAuthenticated());
         }
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
-        $client->clickLink('Consulter la liste des tâches à faire');
+        $this->client->clickLink('Consulter la liste des tâches à faire');
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
-        // dd($client->getResponse()->getContent());
-        $client->request(Request::METHOD_GET, '/tasks/1/edit');
+        // dd($this->client->getResponse()->getContent());
+        $this->client->request(Request::METHOD_GET, '/tasks/1/edit');
 
         self::assertResponseIsSuccessful();
          
         self::assertRouteSame('task_edit');
 
-        $client->submitForm('Modifier', self::createFormData());
+        $this->client->submitForm('Modifier', self::createFormData());
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
         self::assertResponseIsSuccessful();
-        // dd($client->getResponse()->getContent());
+        // dd($this->client->getResponse()->getContent());
         self::assertRouteSame('task_list');
 
         /**
          * @var TaskRepository $taskRepository
          */
-        $taskRepository = $client->getContainer()->get(TaskRepository::class);
+        $taskRepository = $this->client->getContainer()->get(TaskRepository::class);
         
         /** @var Task|null $task */
         $task = $taskRepository->find('1');

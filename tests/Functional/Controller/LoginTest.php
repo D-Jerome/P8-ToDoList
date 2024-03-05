@@ -10,6 +10,7 @@ use Generator;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
@@ -17,26 +18,34 @@ use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
 class loginTest extends WebTestCase
 {
 
+    private KernelBrowser|null $client = null;
 
+    public function setUp() : void
+ 
+  {
+    $this->client = static::createClient();
+  }
+    
+    
     public function testShouldAuthenticate():void
     {
-        $client = self::createClient();
+        // $client = self::createClient();
         
-        $client->request(Request::METHOD_GET, '/login');
+        $this->client->request(Request::METHOD_GET, '/login');
 
-        $client->submitForm('Se connecter', self::createFormData());
+        $this->client->submitForm('Se connecter', self::createFormData());
 
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
-        $client->enableProfiler();
+        $this->client->enableProfiler();
 
-        if (($profile = $client->getProfile()) instanceof Profile) {
+        if (($profile = $this->client->getProfile()) instanceof Profile) {
             /** @var SecurityDataCollector $securityCollector */
             $securityCollector = $profile->getCollector('security');
             self::assertTrue($securityCollector->isAuthenticated());
         }
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
         self::assertResponseIsSuccessful();
         // dd($client->getResponse()->getContent());
@@ -71,23 +80,23 @@ class loginTest extends WebTestCase
        */
     public function testShouldShowErrors(array $formData):void
     {
-        $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/login');
+        // $client = self::createClient();
+        $this->client->request(Request::METHOD_GET, '/login');
 
-        $client->submitForm('Se connecter',$formData);
+        $this->client->submitForm('Se connecter',$formData);
 
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
-        $client->enableProfiler();
+        $this->client->enableProfiler();
 
-        if (($profile = $client->getProfile()) instanceof Profile) {
+        if (($profile = $this->client->getProfile()) instanceof Profile) {
             /** @var SecurityDataCollector $securityCollector */
             $securityCollector = $profile->getCollector('security');
         
             self::assertFalse($securityCollector->isAuthenticated());
         }
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
         self::assertResponseIsSuccessful();
         // dd($client->getResponse()->getContent());
@@ -97,31 +106,31 @@ class loginTest extends WebTestCase
 
     public function testLogoutPageWithUserConnected(): void
     {
-        $client = self::createClient();
+        // $client = self::createClient();
         
-        $client->request(Request::METHOD_GET, '/login');
+        $this->client->request(Request::METHOD_GET, '/login');
 
-        $client->submitForm('Se connecter', self::createFormData());
+        $this->client->submitForm('Se connecter', self::createFormData());
 
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
-        $client->enableProfiler();
+        $this->client->enableProfiler();
 
-        if (($profile = $client->getProfile()) instanceof Profile) {
+        if (($profile = $this->client->getProfile()) instanceof Profile) {
             /** @var SecurityDataCollector $securityCollector */
             $securityCollector = $profile->getCollector('security');
             self::assertTrue($securityCollector->isAuthenticated());
         }
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
         self::assertResponseIsSuccessful();
         // dd($client->getResponse()->getContent());
         self::assertRouteSame('homepage');
 
-        $client->request(Request::METHOD_GET, '/logout');
+        $this->client->request(Request::METHOD_GET, '/logout');
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
         self::assertRouteSame('homepage');
     }
@@ -129,31 +138,31 @@ class loginTest extends WebTestCase
     
     public function testLogout(): void
     {
-        $client = self::createClient();
+        // $client = self::createClient();
         
-        $client->request(Request::METHOD_GET, '/login');
+        $this->client->request(Request::METHOD_GET, '/login');
 
-        $client->submitForm('Se connecter', self::createFormData());
+        $this->client->submitForm('Se connecter', self::createFormData());
 
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
-        $client->enableProfiler();
+        $this->client->enableProfiler();
 
-        if (($profile = $client->getProfile()) instanceof Profile) {
+        if (($profile = $this->client->getProfile()) instanceof Profile) {
             /** @var SecurityDataCollector $securityCollector */
             $securityCollector = $profile->getCollector('security');
             self::assertTrue($securityCollector->isAuthenticated());
         }
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
         self::assertResponseIsSuccessful();
         // dd($client->getResponse()->getContent());
         self::assertRouteSame('homepage');
 
-        $client->clickLink('Se déconnecter');
+        $this->client->clickLink('Se déconnecter');
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
 
         self::assertRouteSame('homepage');

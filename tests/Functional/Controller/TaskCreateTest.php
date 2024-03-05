@@ -15,6 +15,15 @@ use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
 class TaskCreateTest extends WebTestCase
 {
 
+    private KernelBrowser|null $client = null;
+
+    public function setUp() : void
+ 
+  {
+    $this->client = static::createClient();
+  }
+    
+    
     /**
      * Undocumented function
      *
@@ -46,31 +55,31 @@ class TaskCreateTest extends WebTestCase
 
     public function testCreateTask(): void
     {
-        $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/login');
+        // $this->client = self::createClient();
+        $this->client->request(Request::METHOD_GET, '/login');
 
-        $client->submitForm('Se connecter', self::userFormData());
+        $this->client->submitForm('Se connecter', self::userFormData());
 
-        $client->enableProfiler();
+        $this->client->enableProfiler();
 
-        if (($profile = $client->getProfile()) instanceof Profile) {
+        if (($profile = $this->client->getProfile()) instanceof Profile) {
             /** @var SecurityDataCollector $securityCollector */
             $securityCollector = $profile->getCollector('security');
             self::assertTrue($securityCollector->isAuthenticated());
         }
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
-        $client->clickLink('Consulter la liste des tâches à faire');
+        $this->client->clickLink('Consulter la liste des tâches à faire');
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
-        // dd($client->getResponse()->getContent());
-        $client->clickLink('Créer une tâche');
+        // dd($this->client->getResponse()->getContent());
+        $this->client->clickLink('Créer une tâche');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $client->submitForm('Ajouter', self::createFormData());
-        // dd($client->getResponse()->getContent());
-        $client->followRedirect();
+        $this->client->submitForm('Ajouter', self::createFormData());
+        // dd($this->client->getResponse()->getContent());
+        $this->client->followRedirect();
 
         self::assertResponseIsSuccessful();
          
@@ -79,7 +88,7 @@ class TaskCreateTest extends WebTestCase
         /**
          * @var TaskRepository $taskRepository
          */
-        $taskRepository = $client->getContainer()->get(TaskRepository::class);
+        $taskRepository = $this->client->getContainer()->get(TaskRepository::class);
         
         /** @var Task|null $task */
         $task = $taskRepository->find('11');

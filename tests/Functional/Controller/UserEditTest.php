@@ -7,12 +7,21 @@ use App\Entity\User;
 use App\Repository\UserRepository;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 
 class UserEditTest extends WebTestCase
 {
     
+    private KernelBrowser|null $client = null;
+
+    public function setUp() : void
+    {
+        $this->client = static::createClient();
+    }
+    
+
     public function provideBadData(): Generator
     {
         yield 'empty username' => [self::createFormData(['user[username]' => ''] )];
@@ -41,13 +50,13 @@ class UserEditTest extends WebTestCase
     
     public function testShowUserEditPageFromUsers():void
     {
-        $client = self::createClient();
+        // $this->client = self::createClient();
 
-        $client->request(Request::METHOD_GET, '/users');
+        $this->client->request(Request::METHOD_GET, '/users');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $client->clickLink('Edit');
+        $this->client->clickLink('Edit');
 
          self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
@@ -57,27 +66,27 @@ class UserEditTest extends WebTestCase
 
     public function testEditUser():void
     {
-        $client = self::createClient();
+        // $this->client = self::createClient();
 
-        $client->request(Request::METHOD_GET, '/users/1/edit');
+        $this->client->request(Request::METHOD_GET, '/users/1/edit');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
 
-        $client->submitForm('Modifier', self::createFormData());
+        $this->client->submitForm('Modifier', self::createFormData());
 
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
         self::assertResponseIsSuccessful();
-        // dd($client->getResponse()->getContent());
+        // dd($this->client->getResponse()->getContent());
         self::assertRouteSame('user_list');
 
         /**
          * @var UserRepository $userRepository
          */
-        $userRepository = $client->getContainer()->get(UserRepository::class);
+        $userRepository = $this->client->getContainer()->get(UserRepository::class);
         
         /** @var User|null $user */
         $user = $userRepository->find('1');
@@ -95,13 +104,13 @@ class UserEditTest extends WebTestCase
      */
     public function testUpdateUserWithErrors(array $formData):void
     {
-        $client = self::createClient();
+        // $this->client = self::createClient();
 
-        $client->request(Request::METHOD_GET, '/users/1/edit');
+        $this->client->request(Request::METHOD_GET, '/users/1/edit');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $client->submitForm('Modifier', $formData);
+        $this->client->submitForm('Modifier', $formData);
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 

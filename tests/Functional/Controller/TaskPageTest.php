@@ -15,6 +15,15 @@ use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
 class TaskPageTest extends WebTestCase
 {
 
+    private KernelBrowser|null $client = null;
+
+    public function setUp() : void
+ 
+  {
+    $this->client = static::createClient();
+  }
+    
+
     /**
      * Undocumented function
      *
@@ -31,75 +40,75 @@ class TaskPageTest extends WebTestCase
 
     public function testShowTaskListToDo(): void
     {
-        $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/login');
+        // $this->client = self::createClient();
+        $this->client->request(Request::METHOD_GET, '/login');
 
-        $client->submitForm('Se connecter', self::createFormData());
+        $this->client->submitForm('Se connecter', self::createFormData());
 
-        $client->enableProfiler();
+        $this->client->enableProfiler();
 
-        if (($profile = $client->getProfile()) instanceof Profile) {
+        if (($profile = $this->client->getProfile()) instanceof Profile) {
             /** @var SecurityDataCollector $securityCollector */
             $securityCollector = $profile->getCollector('security');
             self::assertTrue($securityCollector->isAuthenticated());
         }
 
-        $client->followRedirect();
+        $this->client->followRedirect();
         self::assertResponseIsSuccessful();
-        // dd($client->getResponse()->getContent());
+        // dd($this->client->getResponse()->getContent());
         self::assertRouteSame('homepage');
 
-        $client->clickLink('Consulter la liste des tâches à faire');
+        $this->client->clickLink('Consulter la liste des tâches à faire');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
     }
 
     public function testShowTaskListClosed(): void
     {
-        $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/login');
+        // $this->client = self::createClient();
+        $this->client->request(Request::METHOD_GET, '/login');
 
-        $client->submitForm('Se connecter', self::createFormData());
+        $this->client->submitForm('Se connecter', self::createFormData());
 
-        $client->enableProfiler();
+        $this->client->enableProfiler();
 
-        if (($profile = $client->getProfile()) instanceof Profile) {
+        if (($profile = $this->client->getProfile()) instanceof Profile) {
             /** @var SecurityDataCollector $securityCollector */
             $securityCollector = $profile->getCollector('security');
             self::assertTrue($securityCollector->isAuthenticated());
         }
 
-        $client->followRedirect();
+        $this->client->followRedirect();
         self::assertResponseIsSuccessful();
-        // dd($client->getResponse()->getContent());
+        // dd($this->client->getResponse()->getContent());
         self::assertRouteSame('homepage');
 
-        $client->clickLink('Consulter la liste des tâches terminées');
+        $this->client->clickLink('Consulter la liste des tâches terminées');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
     }
 
     public function testShowTaskToCreate(): void
     {
-        $client = self::createClient();
-        $client->request(Request::METHOD_GET, '/login');
+        // $this->client = self::createClient();
+        $this->client->request(Request::METHOD_GET, '/login');
 
-        $client->submitForm('Se connecter', self::createFormData());
+        $this->client->submitForm('Se connecter', self::createFormData());
 
-        $client->enableProfiler();
+        $this->client->enableProfiler();
 
-        if (($profile = $client->getProfile()) instanceof Profile) {
+        if (($profile = $this->client->getProfile()) instanceof Profile) {
             /** @var SecurityDataCollector $securityCollector */
             $securityCollector = $profile->getCollector('security');
             self::assertTrue($securityCollector->isAuthenticated());
         }
 
-        $client->followRedirect();
+        $this->client->followRedirect();
         self::assertResponseIsSuccessful();
-        // dd($client->getResponse()->getContent());
+        // dd($this->client->getResponse()->getContent());
         self::assertRouteSame('homepage');
 
-        $client->clickLink('Créer une nouvelle tâche');
+        $this->client->clickLink('Créer une nouvelle tâche');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
     }

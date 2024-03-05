@@ -9,12 +9,20 @@ use App\Repository\UserRepository;
 
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 
 
 class UserCreateTest extends WebTestCase
 {
+    private KernelBrowser|null $client = null;
+
+    public function setUp() : void
+    {
+        $this->client = static::createClient();
+    }
     
+
     public function provideBadData(): Generator
     {
         yield 'empty username' => [self::createFormData(['user[username]' => ''] )];
@@ -44,13 +52,13 @@ class UserCreateTest extends WebTestCase
     
     public function testShowUserCreatePageFromLogin():void
     {
-        $client = self::createClient();
+        // $this->client = self::createClient();
 
-        $client->request(Request::METHOD_GET, '/login');
+        $this->client->request(Request::METHOD_GET, '/login');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $client->clickLink('Créer un utilisateur');
+        $this->client->clickLink('Créer un utilisateur');
 
          self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
@@ -58,27 +66,27 @@ class UserCreateTest extends WebTestCase
 
     public function testCreateUser():void
     {
-        $client = self::createClient();
+        // $this->client = self::createClient();
 
-        $client->request(Request::METHOD_GET, '/users/create');
+        $this->client->request(Request::METHOD_GET, '/users/create');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
         
-        $client->submitForm('Ajouter', self::createFormData());
+        $this->client->submitForm('Ajouter', self::createFormData());
         
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
-        $client->followRedirect();
+        $this->client->followRedirect();
 
         self::assertResponseIsSuccessful();
-        // dd($client->getResponse()->getContent());
+        // dd($this->client->getResponse()->getContent());
         self::assertRouteSame('user_list');
 
         /**
          * @var UserRepository $userRepository
          */
-        $userRepository = $client->getContainer()->get(UserRepository::class);
+        $userRepository = $this->client->getContainer()->get(UserRepository::class);
         
         /** @var User|null $user */
         $user = $userRepository->find('2');
@@ -96,13 +104,13 @@ class UserCreateTest extends WebTestCase
      */
     public function testCreateUserWithErrors(array $formData):void
     {
-        $client = self::createClient();
+        // $this->client = self::createClient();
 
-        $client->request(Request::METHOD_GET, '/users/create');
+        $this->client->request(Request::METHOD_GET, '/users/create');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $client->submitForm('Ajouter', $formData);
+        $this->client->submitForm('Ajouter', $formData);
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
         
