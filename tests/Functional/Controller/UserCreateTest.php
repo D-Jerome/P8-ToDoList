@@ -18,7 +18,7 @@ class UserCreateTest extends WebTestCase
     public function provideBadData(): Generator
     {
         yield 'empty username' => [self::createFormData(['user[username]' => ''] )];
-        yield 'empty password' => [self::createFormData(['user[password]' => ''] )];
+        yield 'empty password' => [self::createFormData(['user[password][second]' => ''] )];
         yield 'empty email' => [self::createFormData(['user[email]' => ''] )];
         yield 'bad password' => [self::createFormData(['user[password][second]' => 'fail'])];
         yield 'bad email' => [self::createFormData(['user[email]' => 'fail.fail.fail'])];
@@ -104,8 +104,16 @@ class UserCreateTest extends WebTestCase
 
         $client->submitForm('Ajouter', $formData);
 
-        self::assertAnySelectorTextContains()
-
-
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+        
+        if ($formData['user[email]'] === 'fail.fail.fail'){
+            self::assertAnySelectorTextContains('ul li', 'Le format');
+        }else{
+            if ($formData['user[password][second]'] !== 'password'){
+                self::assertAnySelectorTextContains('ul li', 'Les deux mots de passe doivent correspondre.');
+            }else{
+                self::assertAnySelectorTextContains('ul li', 'Vous devez');
+            }
+        }
     }
 }
