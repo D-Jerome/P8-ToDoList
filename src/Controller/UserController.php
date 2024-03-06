@@ -13,10 +13,12 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 use Webmozart\Assert\Assert;
 
 class UserController extends AbstractController
 {
+    #[IsGranted('ROLE_ADMIN', message: 'Accés non autorisé')]
     #[Route(path: '/users', name: 'user_list')]
     public function list(UserRepository $userRepository): Response
     {

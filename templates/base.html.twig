@@ -32,7 +32,9 @@
 				<div class="collapse navbar-collapse " id="navbarColor02">
 					<ul class="navbar-nav w-100 justify-content-end me-auto">
 						<li class="nav-item">
-							<a class="nav-link" href="{{ path('user_list') }}">Utilisateurs</a>
+							{% if app.user  %}
+								<a class="nav-link" href="{{ path('user_list') }}">Utilisateurs</a>
+							{% endif %}
 						</li>
 					</ul>
 				</div>
