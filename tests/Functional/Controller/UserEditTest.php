@@ -1,56 +1,60 @@
-<?php 
+<?php
+
+declare(strict_types=1);
 
 namespace App\Tests\Functionnal\Controller;
 
-use Generator;
 use App\Entity\User;
 use App\Repository\UserRepository;
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Webmozart\Assert\Assert;
 
-
-class UserEditTest extends WebTestCase
+/**
+ * @internal
+ * @coversNothing
+ */
+final class UserEditTest extends WebTestCase
 {
-    
-    private KernelBrowser|null $client = null;
+    private null | KernelBrowser $client = null;
 
-    public function setUp() : void
+    protected function setUp(): void
     {
-        $this->client = static::createClient();
+        $this->client = self::createClient();
     }
-    
 
-    public function provideBadData(): Generator
+    /**
+     * @return array<int,array<string,string>>
+     */
+    public static function provideUpdateUserWithErrorsCases(): iterable
     {
-        yield 'empty username' => [self::createFormData(['user[username]' => ''] )];
-        yield 'empty email' => [self::createFormData(['user[email]' => ''] )];
+        yield 'empty username' => [self::createFormData(['user[username]' => ''])];
+        yield 'empty email' => [self::createFormData(['user[email]' => ''])];
         yield 'bad password' => [self::createFormData(['user[password][second]' => 'fail'])];
         yield 'bad email' => [self::createFormData(['user[email]' => 'fail.fail.fail'])];
     }
-    
+
     /**
-     * 
      * Undocumented function
      *
-     * @param array<string,string> $overrideData
+     * @param  array<string,string> $overrideData
      * @return array<string,string>
      */
     private static function createFormData(array $overrideData = []): array
     {
-        return $overrideData +[
-            'user[username]' => 'testo',
-            'user[password][first]' => 'password',
+        return $overrideData + [
+            'user[username]'         => 'testo',
+            'user[password][first]'  => 'password',
             'user[password][second]' => 'password',
-            'user[email]' => 'testo@test.email'
+            'user[email]'            => 'testo@test.email',
         ];
     }
-    
-    
-    public function testShowUserEditPageFromUsers():void
+
+    public function testShowUserEditPageFromUsers(): void
     {
-        // $this->client = self::createClient();
+        Assert::isInstanceOf($this->client, KernelBrowser::class);
 
         $this->client->request(Request::METHOD_GET, '/users');
 
@@ -58,20 +62,16 @@ class UserEditTest extends WebTestCase
 
         $this->client->clickLink('Edit');
 
-         self::assertResponseStatusCodeSame(Response::HTTP_OK);
-
-        
-
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
     }
 
-    public function testEditUser():void
+    public function testEditUser(): void
     {
-        // $this->client = self::createClient();
+        Assert::isInstanceOf($this->client, KernelBrowser::class);
 
         $this->client->request(Request::METHOD_GET, '/users/1/edit');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
-
 
         $this->client->submitForm('Modifier', self::createFormData());
 
@@ -87,24 +87,23 @@ class UserEditTest extends WebTestCase
          * @var UserRepository $userRepository
          */
         $userRepository = $this->client->getContainer()->get(UserRepository::class);
-        
+
         /** @var User|null $user */
         $user = $userRepository->find('1');
         self::assertNotNull($user);
-        self::assertEquals('testo', $user->getUsername());
-        self::assertEquals('testo@test.email', $user->getEmail());
+        self::assertSame('testo', $user->getUsername());
+        self::assertSame('testo@test.email', $user->getEmail());
         self::assertNotNull($user->getPassword());
     }
 
     /**
      * Undocumented function
-     * @dataProvider provideBadData
+     * @dataProvider provideUpdateUserWithErrorsCases
      * @param array<string,string> $formData
-     * @return void
      */
-    public function testUpdateUserWithErrors(array $formData):void
+    public function testUpdateUserWithErrors(array $formData): void
     {
-        // $this->client = self::createClient();
+        Assert::isInstanceOf($this->client, KernelBrowser::class);
 
         $this->client->request(Request::METHOD_GET, '/users/1/edit');
 
@@ -114,16 +113,14 @@ class UserEditTest extends WebTestCase
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        if ($formData['user[email]'] === 'fail.fail.fail'){
+        if ('fail.fail.fail' === $formData['user[email]']) {
             self::assertAnySelectorTextContains('ul li', 'Le format');
-        }else{
-            if ($formData['user[password][second]'] !== 'password'){
+        } else {
+            if ('password' !== $formData['user[password][second]']) {
                 self::assertAnySelectorTextContains('ul li', 'Les deux mots de passe doivent correspondre.');
-            }else{
+            } else {
                 self::assertAnySelectorTextContains('ul li', 'Vous devez');
             }
         }
-
-
     }
 }

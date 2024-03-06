@@ -1,30 +1,33 @@
-<?php 
+<?php
 
 declare(strict_types=1);
 
 namespace App\Tests\Functionnal\Controller;
 
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Webmozart\Assert\Assert;
 
-
-class LoginPageTest extends WebTestCase
+/**
+ * @internal
+ * @coversNothing
+ */
+final class LoginPageTest extends WebTestCase
 {
-    private KernelBrowser|null $client = null;
+    private null | KernelBrowser $client = null;
 
-    public function setUp() : void
- 
-  {
-    $this->client = static::createClient();
-  }
- 
-    public function testShowLoginPage():void
+    protected function setUp(): void
     {
+        $this->client = self::createClient();
+    }
+
+    public function testShowLoginPage(): void
+    {
+        Assert::isInstanceOf($this->client, KernelBrowser::class);
         $this->client->request(Request::METHOD_GET, '/login');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
     }
-
 }
