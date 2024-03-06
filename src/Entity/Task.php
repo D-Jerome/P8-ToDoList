@@ -41,7 +41,7 @@ class Task
         $this->isDone = false;
     }
 
-    public function getId(): int
+    public function getId(): ?int
     {
         return $this->id;
     }
@@ -56,7 +56,7 @@ class Task
         $this->createdAt = $createdAt;
     }
 
-    public function getTitle(): string
+    public function getTitle(): ?string
     {
         return $this->title;
     }
@@ -66,7 +66,7 @@ class Task
         $this->title = $title;
     }
 
-    public function getContent(): string
+    public function getContent(): ?string
     {
         return $this->content;
     }
@@ -86,7 +86,7 @@ class Task
         $this->isDone = $flag;
     }
 
-    public function getUser(): User
+    public function getUser(): ?User
     {
         return $this->user;
     }
