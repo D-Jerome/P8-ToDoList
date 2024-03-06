@@ -29,7 +29,6 @@ class TaskController extends AbstractController
         return $this->render('task/list.html.twig', ['tasks' => $taskRepository->findBy(['user' => $connectedUser, 'isDone' => true])]);
     }
 
-
     #[Route(path: '/tasks/create', name: 'task_create')]
     public function create(
         Request $request,
@@ -80,19 +79,16 @@ class TaskController extends AbstractController
     {
         $task->toggle(!$task->isDone());
         $em->flush();
-        if ($task->isDone()){
+        if ($task->isDone()) {
             $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme faite.', $task->getTitle()));
 
             return $this->redirectToRoute('task_list');
         }
 
-
         $this->addFlash('success', sprintf('La tâche %s a bien été marquée comme non faite.', $task->getTitle()));
 
         return $this->redirectToRoute('task_list_done');
     }
-
-
 
     #[Route(path: '/tasks/{id}/delete', name: 'task_delete')]
     public function deleteTask(Task $task, EntityManagerInterface $em): Response
@@ -101,9 +97,10 @@ class TaskController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'La tâche a bien été supprimée.');
-        if ($task->isDone()){
+        if ($task->isDone()) {
             return $this->redirectToRoute('task_list_done');
         }
+
         return $this->redirectToRoute('task_list');
     }
 }

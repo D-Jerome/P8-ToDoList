@@ -12,8 +12,8 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity]
-#[UniqueEntity('email',message: "Email déjà utilisé")]
-#[UniqueEntity('username',message: "nom d'utilisateur déjà utilisé")]
+#[UniqueEntity('email', message: 'Email déjà utilisé')]
+#[UniqueEntity('username', message: "nom d'utilisateur déjà utilisé")]
 #[ORM\Table('user')]
 class User implements UserInterface, PasswordAuthenticatedUserInterface
 {
@@ -27,6 +27,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $username = null;
 
     #[ORM\Column(type: 'string', length: 64)]
+    #[Assert\PasswordStrength(message:'Mot de passe trop simple à deviner')]
     private string $password;
 
     #[ORM\Column(type: 'string', length: 60, unique: true)]
