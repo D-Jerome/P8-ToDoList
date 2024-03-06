@@ -24,7 +24,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     #[ORM\Column(type: 'string', length: 25, unique: true)]
     #[Assert\NotBlank(message: "Vous devez saisir un nom d'utilisateur.")]
-    private ?string $username = null;
+    private string $username;
 
     #[ORM\Column(type: 'string', length: 64)]
     #[Assert\PasswordStrength(message:'Mot de passe trop simple à deviner')]
@@ -57,12 +57,12 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         return $this->id;
     }
 
-    public function getUsername(): ?string
+    public function getUsername(): string
     {
         return $this->username;
     }
 
-    public function setUsername(?string $username): void
+    public function setUsername(string $username): void
     {
         $this->username = $username;
     }

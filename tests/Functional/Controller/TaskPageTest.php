@@ -1,46 +1,47 @@
-<?php 
+<?php
+
+declare(strict_types=1);
 
 namespace App\Tests\Functionnal\Controller;
 
-
-
+use Webmozart\Assert\Assert;
 use Symfony\Component\HttpFoundation\Request;
-
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
 
-class TaskPageTest extends WebTestCase
+/**
+ * @internal
+ * @coversNothing
+ */
+final class TaskPageTest extends WebTestCase
 {
+    private null | KernelBrowser $client = null;
 
-    private KernelBrowser|null $client = null;
-
-    public function setUp() : void
- 
-  {
-    $this->client = static::createClient();
-  }
-    
+    protected function setUp(): void
+    {
+        $this->client = self::createClient();
+    }
 
     /**
      * Undocumented function
      *
-     * @param array<string,string> $overrideData
+     * @param  array<string,string> $overrideData
      * @return array<string,string>
      */
     private static function createFormData(array $overrideData = []): array
     {
-        return $overrideData +[
+        return $overrideData + [
             '_username' => 'test',
-            '_password' => 'password'
+            '_password' => 'password',
         ];
     }
 
     public function testShowTaskListToDo(): void
     {
-        // $this->client = self::createClient();
+        Assert::isInstanceOf($this->client, KernelBrowser::class);
         $this->client->request(Request::METHOD_GET, '/login');
 
         $this->client->submitForm('Se connecter', self::createFormData());
@@ -65,7 +66,7 @@ class TaskPageTest extends WebTestCase
 
     public function testShowTaskListClosed(): void
     {
-        // $this->client = self::createClient();
+        Assert::isInstanceOf($this->client, KernelBrowser::class);
         $this->client->request(Request::METHOD_GET, '/login');
 
         $this->client->submitForm('Se connecter', self::createFormData());
@@ -90,7 +91,7 @@ class TaskPageTest extends WebTestCase
 
     public function testShowTaskToCreate(): void
     {
-        // $this->client = self::createClient();
+        Assert::isInstanceOf($this->client, KernelBrowser::class);
         $this->client->request(Request::METHOD_GET, '/login');
 
         $this->client->submitForm('Se connecter', self::createFormData());

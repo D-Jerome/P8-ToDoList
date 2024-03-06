@@ -1,61 +1,63 @@
-<?php 
+<?php
+
+declare(strict_types=1);
 
 namespace App\Tests\Functionnal\Controller;
 
 use App\Entity\Task;
 use App\Repository\TaskRepository;
-
-use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Component\HttpKernel\Profiler\Profile;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
+use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpKernel\Profiler\Profile;
+use Webmozart\Assert\Assert;
 
-class TaskCreateTest extends WebTestCase
+/**
+ * @internal
+ * @coversNothing
+ */
+final class TaskCreateTest extends WebTestCase
 {
+    private null | KernelBrowser $client = null;
 
-    private KernelBrowser|null $client = null;
+    protected function setUp(): void
+    {
+        $this->client = self::createClient();
+    }
 
-    public function setUp() : void
- 
-  {
-    $this->client = static::createClient();
-  }
-    
-    
     /**
      * Undocumented function
      *
-     * @param array<string,string> $overrideData
+     * @param  array<string,string> $overrideData
      * @return array<string,string>
      */
     private static function userFormData(array $overrideData = []): array
     {
-        return $overrideData +[
+        return $overrideData + [
             '_username' => 'test',
-            '_password' => 'password'
+            '_password' => 'password',
         ];
     }
-
 
     /**
      * Undocumented function
      *
-     * @param array<string,string> $overrideData
+     * @param  array<string,string> $overrideData
      * @return array<string,string>
      */
     private static function createFormData(array $overrideData = []): array
     {
-        return $overrideData +[
-            'task[title]' => 'Task 1',
-            'task[content]' => 'test Task 1 content'
+        return $overrideData + [
+            'task[title]'   => 'Task 1',
+            'task[content]' => 'test Task 1 content',
         ];
     }
 
     public function testCreateTask(): void
     {
-        // $this->client = self::createClient();
+        Assert::isInstanceOf($this->client, KernelBrowser::class);
         $this->client->request(Request::METHOD_GET, '/login');
 
         $this->client->submitForm('Se connecter', self::userFormData());
@@ -82,22 +84,20 @@ class TaskCreateTest extends WebTestCase
         $this->client->followRedirect();
 
         self::assertResponseIsSuccessful();
-         
+
         self::assertRouteSame('task_list');
 
         /**
          * @var TaskRepository $taskRepository
          */
         $taskRepository = $this->client->getContainer()->get(TaskRepository::class);
-        
+
         /** @var Task|null $task */
         $task = $taskRepository->find('11');
 
         self::assertNotNull($task);
-        self::assertEquals('Task 1', $task->getTitle());
-        self::assertEquals('test Task 1 content', $task->getContent());
+        self::assertSame('Task 1', $task->getTitle());
+        self::assertSame('test Task 1 content', $task->getContent());
         self::assertNotNull($task->getCreatedAt());
     }
-
-
 }
