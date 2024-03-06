@@ -33,6 +33,11 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     #[Assert\Email(message: "Le format de l'adresse n'est pas correcte.")]
     private ?string $email = null;
 
+    /**
+     * tasks linked to user
+     *
+     * @var Collection<int,Task>
+     */
     #[ORM\OneToMany(mappedBy: 'user', targetEntity: Task::class, cascade: ['remove'])]
     #[ORM\JoinColumn()]
     private Collection $tasks;
@@ -57,7 +62,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     //     return null;
     // }
 
-    public function getPassword(): ?string
+    public function getPassword(): string
     {
         return $this->password;
     }
@@ -93,6 +98,7 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
 
     /**
      * Get the value of tasks
+     * @return Collection<int,Task>
      */
     public function getTasks(): ?Collection
     {

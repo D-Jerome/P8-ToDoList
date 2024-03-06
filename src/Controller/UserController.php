@@ -10,20 +10,24 @@ use App\Repository\UserRepository;
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
 
 class UserController extends AbstractController
 {
     #[Route(path: '/users', name: 'user_list')]
-    public function list(UserRepository $userRepository)
+    public function list(UserRepository $userRepository): Response
     {
         return $this->render('user/list.html.twig', ['users' => $userRepository->findAll()]);
     }
 
     #[Route(path: '/users/create', name: 'user_create')]
-    public function create(Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $em)
-    {
+    public function create(
+        Request $request,
+        UserPasswordHasherInterface $hasher,
+        EntityManagerInterface $em
+    ): Response {
         $user = new User();
         $form = $this->createForm(UserType::class, $user);
 
@@ -45,8 +49,12 @@ class UserController extends AbstractController
     }
 
     #[Route(path: '/users/{id}/edit', name: 'user_edit')]
-    public function edit(User $user, Request $request, UserPasswordHasherInterface $hasher, EntityManagerInterface $em)
-    {
+    public function edit(
+        User $user,
+        Request $request,
+        UserPasswordHasherInterface $hasher,
+        EntityManagerInterface $em
+    ): Response {
         $form = $this->createForm(UserType::class, $user);
 
         $form->handleRequest($request);
