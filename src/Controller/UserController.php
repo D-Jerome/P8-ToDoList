@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 use Symfony\Component\Routing\Annotation\Route;
+use Webmozart\Assert\Assert;
 
 class UserController extends AbstractController
 {
@@ -36,7 +37,9 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $password = $hasher->hashPassword($user, $user->getPassword());
             $user->setPassword($password);
-
+            $roles = $form->get('roles')->getData();
+            Assert::string($roles);
+            $user->setRoles([$roles]);
             $em->persist($user);
             $em->flush();
 
@@ -62,7 +65,9 @@ class UserController extends AbstractController
         if ($form->isSubmitted() && $form->isValid()) {
             $password = $hasher->hashPassword($user, $user->getPassword());
             $user->setPassword($password);
-
+            $roles = $form->get('roles')->getData();
+            Assert::string($roles);
+            $user->setRoles([$roles]);
             $em->flush();
 
             $this->addFlash('success', "L'utilisateur a bien été modifié");

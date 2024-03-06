@@ -34,6 +34,14 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
     private ?string $email = null;
 
     /**
+     * Undocumented variable
+     *
+     * @var array<int,string>
+     */
+    #[ORM\Column(length: 50)]
+    private array $roles = ['ROLE_USER'];
+
+    /**
      * tasks linked to user
      *
      * @var Collection<int,Task>
@@ -82,9 +90,24 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface
         $this->email = $email;
     }
 
+    /**
+     * set Roles
+     *
+     * @param array<int,string> $roles
+     */
+    public function setRoles(array $roles): void
+    {
+        $this->roles = $roles;
+    }
+
+    /**
+     * get Roles
+     *
+     * @return array<int,string>
+     */
     public function getRoles(): array
     {
-        return ['ROLE_USER'];
+        return $this->roles;
     }
 
     public function eraseCredentials(): void
