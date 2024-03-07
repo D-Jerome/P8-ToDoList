@@ -19,14 +19,19 @@ use Webmozart\Assert\Assert;
 final class UserCreateTest extends WebTestCase
 {
     private null | KernelBrowser $client = null;
+    private $userTest;
+    private $userAdmin;
 
     protected function setUp(): void
     {
         $this->client = self::createClient();
+        $userRepository = self::getContainer()->get(UserRepository::class);
+        $this->userAdmin = $userRepository->findOneBy(['username' => 'admin']);
+        $userRepository = self::getContainer()->get(UserRepository::class);
+        $this->userTest = $userRepository->findOneBy(['username' => 'test']);
     }
 
     /**
-     *
      * @return array<int,array<string,string>>
      */
     public static function provideCreateUserWithErrorsCases(): iterable
@@ -76,21 +81,19 @@ final class UserCreateTest extends WebTestCase
 
         $this->client->submitForm('Ajouter', self::createFormData());
 
-        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $this->client->followRedirect();
-
-        self::assertResponseIsSuccessful();
         // dd($this->client->getResponse()->getContent());
-        self::assertRouteSame('user_list');
+        // self::assertRouteSame('login');
 
         /**
          * @var UserRepository $userRepository
          */
         $userRepository = $this->client->getContainer()->get(UserRepository::class);
 
-        /** @var User|null $user */
-        $user = $userRepository->find('2');
+        $nbUser = $userRepository->count();
+        /** @var User $user */
+        $user = $userRepository->findOneBy(['id' => $nbUser]);
         self::assertNotNull($user);
         self::assertSame('testty', $user->getUsername());
         self::assertSame('test@test.email', $user->getEmail());

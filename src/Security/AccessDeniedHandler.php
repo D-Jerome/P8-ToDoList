@@ -16,7 +16,8 @@ class AccessDeniedHandler implements AccessDeniedHandlerInterface
 {
     public function __construct(
         private UrlGeneratorInterface $urlGenerator,
-    ) {}
+    ) {
+    }
 
     public function handle(Request $request, AccessDeniedException $accessDeniedException): RedirectResponse
     {

@@ -24,6 +24,6 @@ class AuthenticationEntryPoint implements AuthenticationEntryPointInterface
         Assert::isInstanceOf($session, Session::class);
         $session->getFlashBag()->add('warning', 'Vous devez vous connecter pour accéder à cette page.');
 
-        return new RedirectResponse($this->urlGenerator->generate('app_security_login'));
+        return new RedirectResponse($this->urlGenerator->generate('login'));
     }
 }
