@@ -22,4 +22,17 @@ class TaskRepository extends ServiceEntityRepository
     {
         parent::__construct($registry, Task::class);
     }
+
+    public function findAdminBy($value): array
+    {
+        return $this->createQueryBuilder('t')
+            ->andWhere('t.user = :val')
+            ->orWhere('t.user = :null')
+            ->setParameter('val', $value)
+            ->setParameter('null', null)
+            ->orderBy('t.id', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }
