@@ -34,13 +34,16 @@ class TaskVoter extends Voter
         /** @var Task $task */
         $task = $subject;
 
-        return match($attribute) {
-            self::DELETE => $this->canDelete($task, $user)
-        };
+        switch ($attribute) {
+            case self::DELETE:
+                return $this->canDelete($task, $user);
+        }
+
+        return false;
     }
 
     private function canDelete(Task $task, User $user): bool
     {
-        return $user === $task->getUser();
+        return $user === $task->getUser() || (null === $task->getUser() && $user->getRoles() === ['ROLE_ADMIN']);
     }
 }

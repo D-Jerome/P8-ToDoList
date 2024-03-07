@@ -20,12 +20,20 @@ class TaskController extends AbstractController
     #[Route(path: '/tasks', name: 'task_list')]
     public function list(TaskRepository $taskRepository, #[CurrentUser] User $connectedUser): Response
     {
+        if($connectedUser->getRoles() === ['ROLE_ADMIN']) {
+            return $this->render('task/list.html.twig', ['tasks' => $taskRepository->findBy(['isDone' => false])]);
+        }
+
         return $this->render('task/list.html.twig', ['tasks' => $taskRepository->findBy(['user' => $connectedUser, 'isDone' => false])]);
     }
 
     #[Route(path: '/tasks/done', name: 'task_list_done')]
     public function listDone(TaskRepository $taskRepository, #[CurrentUser] User $connectedUser): Response
     {
+        if($connectedUser->getRoles() === ['ROLE_ADMIN']) {
+            return $this->render('task/list.html.twig', ['tasks' => $taskRepository->findBy(['isDone' => true])]);
+        }
+
         return $this->render('task/list.html.twig', ['tasks' => $taskRepository->findBy(['user' => $connectedUser, 'isDone' => true])]);
     }
 
