@@ -15,12 +15,13 @@ use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 class TaskVoter extends Voter
 {
     public const DELETE = 'TASK_DELETE';
+    public const MODIFY = 'TASK_MODIFY';
 
     protected function supports(string $attribute, mixed $subject): bool
     {
         // replace with your own logic
         // https://symfony.com/doc/current/security/voters.html
-        return \in_array($attribute, [self::DELETE], true)
+        return \in_array($attribute, [self::DELETE, self::MODIFY], true)
             && $subject instanceof Task;
     }
 
@@ -37,6 +38,8 @@ class TaskVoter extends Voter
         switch ($attribute) {
             case self::DELETE:
                 return $this->canDelete($task, $user);
+            case self::MODIFY:
+                return $this->canModify($task, $user);
         }
 
         return false;
@@ -45,5 +48,10 @@ class TaskVoter extends Voter
     private function canDelete(Task $task, User $user): bool
     {
         return $user === $task->getUser() || (null === $task->getUser() && $user->getRoles() === ['ROLE_ADMIN']);
+    }
+
+    private function canModify(Task $task, User $user): bool
+    {
+        return $user === $task->getUser();
     }
 }
