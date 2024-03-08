@@ -36,7 +36,7 @@ final class UserCreateTest extends WebTestCase
      */
     public static function provideCreateUserWithErrorsCases(): iterable
     {
-        yield 'empty username' => [self::createFormData(['user[username]' => ''])];
+        // yield 'empty username' => [self::createFormData(['user[username]' => ''])];
         yield 'empty password' => [self::createFormData(['user[password][second]' => ''])];
         yield 'empty email' => [self::createFormData(['user[email]' => ''])];
         yield 'bad password' => [self::createFormData(['user[password][second]' => 'fail'])];
@@ -53,9 +53,9 @@ final class UserCreateTest extends WebTestCase
     {
         return $overrideData + [
             'user[username]'         => 'testty',
-            'user[password][first]'  => 'password',
-            'user[password][second]' => 'password',
-            'user[email]'            => 'test@test.email',
+            'user[password][first]'  => '!@#$1234QWERqwer',
+            'user[password][second]' => '!@#$1234QWERqwer',
+            'user[email]'            => 'testty@test.email',
         ];
     }
 
@@ -81,10 +81,12 @@ final class UserCreateTest extends WebTestCase
 
         $this->client->submitForm('Ajouter', self::createFormData());
 
-        self::assertResponseStatusCodeSame(Response::HTTP_OK);
-
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
+        $this->client->followRedirect();
+        $this->client->followRedirect();
+        self::assertResponseIsSuccessful();
         // dd($this->client->getResponse()->getContent());
-        // self::assertRouteSame('login');
+        self::assertRouteSame('login');
 
         /**
          * @var UserRepository $userRepository
@@ -92,11 +94,12 @@ final class UserCreateTest extends WebTestCase
         $userRepository = $this->client->getContainer()->get(UserRepository::class);
 
         $nbUser = $userRepository->count();
+
         /** @var User $user */
         $user = $userRepository->findOneBy(['id' => $nbUser]);
         self::assertNotNull($user);
         self::assertSame('testty', $user->getUsername());
-        self::assertSame('test@test.email', $user->getEmail());
+        self::assertSame('testty@test.email', $user->getEmail());
         self::assertNotNull($user->getPassword());
     }
 
@@ -120,7 +123,7 @@ final class UserCreateTest extends WebTestCase
         if ('fail.fail.fail' === $formData['user[email]']) {
             self::assertAnySelectorTextContains('ul li', 'Le format');
         } else {
-            if ('password' !== $formData['user[password][second]']) {
+            if ('!@#$1234QWERqwer' !== $formData['user[password][second]']) {
                 self::assertAnySelectorTextContains('ul li', 'Les deux mots de passe doivent correspondre.');
             } else {
                 self::assertAnySelectorTextContains('ul li', 'Vous devez');

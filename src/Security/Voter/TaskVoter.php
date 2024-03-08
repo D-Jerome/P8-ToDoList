@@ -52,6 +52,6 @@ class TaskVoter extends Voter
 
     private function canModify(Task $task, User $user): bool
     {
-        return $user === $task->getUser();
+        return $user === $task->getUser() || (null === $task->getUser() && !$user && $user->getRoles() === ['ROLE_ADMIN']);
     }
 }

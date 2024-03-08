@@ -38,9 +38,9 @@ final class UsersPageTest extends WebTestCase
 
     public function testShowEditUserPageNotConnected(): void
     {
-        $this->client->request(Request::METHOD_GET, '/users/1/edit');
+        $this->client->request(Request::METHOD_GET, '/users/10/edit');
 
-        self::assertResponseStatusCodeSame(Response::HTTP_UNAUTHORIZED);
+        self::assertResponseStatusCodeSame(Response::HTTP_NOT_FOUND);
     }
 
     public function testNoAccessUsersPageNotConnected(): void

@@ -101,7 +101,7 @@ class TaskController extends AbstractController
         return $this->redirectToRoute('task_list_done');
     }
 
-    #[Route(path: '/tasks/{id}/delete', name: 'task_delete')] 
+    #[Route(path: '/tasks/{id}/delete', name: 'task_delete')]
     #[IsGranted('TASK_DELETE', subject: 'task')]
     public function deleteTask(Task $task, EntityManagerInterface $em): Response
     {
@@ -111,9 +111,6 @@ class TaskController extends AbstractController
         $em->flush();
 
         $this->addFlash('success', 'La tâche a bien été supprimée.');
-        if ($task->isDone()) {
-            return $this->redirectToRoute('task_list_done');
-        }
 
         return $this->redirectToRoute('task_list');
     }

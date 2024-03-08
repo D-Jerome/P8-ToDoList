@@ -9,10 +9,8 @@ use App\Repository\TaskRepository;
 use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpKernel\Profiler\Profile;
 use Webmozart\Assert\Assert;
 
 /**
@@ -80,7 +78,7 @@ final class TaskActionTest extends WebTestCase
         $userId = $this->userTest->getId();
         /** @var Task|null $task */
         $task = $taskRepository->findOneBy(['user' => $userId, 'isDone' => false]);
-
+        $taskDone = $taskRepository->findOneBy(['user' => $userId, 'isDone' => true]);
         $this->client->request(Request::METHOD_GET, "/tasks/{$task->getId()}/toggle");
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
         $this->client->followRedirect();
@@ -88,12 +86,12 @@ final class TaskActionTest extends WebTestCase
         self::assertResponseIsSuccessful();
         // dd($this->client->getResponse()->getContent());
         self::assertRouteSame('task_list');
-
+        $task = $taskRepository->findOneBy(['id' => $task->getId()]);
         self::assertNotNull($task);
 
         self::assertTrue($task->isDone());
 
-        $this->client->request(Request::METHOD_GET, "/tasks/{$task->getId()}/toggle");
+        $this->client->request(Request::METHOD_GET, "/tasks/{$taskDone->getId()}/toggle");
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
         $this->client->followRedirect();
@@ -101,37 +99,23 @@ final class TaskActionTest extends WebTestCase
         self::assertResponseIsSuccessful();
 
         self::assertRouteSame('task_list_done');
+        $taskDone = $taskRepository->findOneBy(['id' => $taskDone->getId()]);
 
-        self::assertNotNull($task);
-        self::assertFalse($task->isDone());
+        self::assertNotNull($taskDone);
+        self::assertFalse($taskDone->isDone());
     }
 
     public function testDeleteTask(): void
     {
         Assert::isInstanceOf($this->client, KernelBrowser::class);
-        $this->client->request(Request::METHOD_GET, '/login');
+        $this->client->loginUser($this->userTest);
 
-        $this->client->submitForm('Se connecter', self::userFormData());
-
-        $this->client->enableProfiler();
-
-        if (($profile = $this->client->getProfile()) instanceof Profile) {
-            /** @var SecurityDataCollector $securityCollector */
-            $securityCollector = $profile->getCollector('security');
-            self::assertTrue($securityCollector->isAuthenticated());
-        }
-
-        $this->client->followRedirect();
-
-        $this->client->clickLink('Consulter la liste des tâches à faire');
-        self::assertResponseStatusCodeSame(Response::HTTP_OK);
-        // dd($this->client->getResponse()->getContent());
-        $this->client->request(Request::METHOD_GET, '/tasks/1/delete');
+        $this->client->request(Request::METHOD_GET, '/tasks/11/delete');
 
         $this->client->followRedirect();
 
         self::assertResponseIsSuccessful();
-
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
         self::assertRouteSame('task_list');
 
         /**
@@ -140,34 +124,17 @@ final class TaskActionTest extends WebTestCase
         $taskRepository = $this->client->getContainer()->get(TaskRepository::class);
 
         /** @var Task|null $task */
-        $task = $taskRepository->find('1');
+        $task = $taskRepository->findOneBy(['id' => '11']);
 
         self::assertNull($task);
     }
 
     public function testEditTask(): void
     {
-        Assert::isInstanceOf($this->client, KernelBrowser::class);
-        $this->client->request(Request::METHOD_GET, '/login');
+        $this->client->loginUser($this->userTest);
 
-        $this->client->submitForm('Se connecter', self::userFormData());
-
-        $this->client->enableProfiler();
-
-        if (($profile = $this->client->getProfile()) instanceof Profile) {
-            /** @var SecurityDataCollector $securityCollector */
-            $securityCollector = $profile->getCollector('security');
-            self::assertTrue($securityCollector->isAuthenticated());
-        }
-
-        $this->client->followRedirect();
-
-        $this->client->clickLink('Consulter la liste des tâches à faire');
+        $this->client->request(Request::METHOD_GET, '/tasks/11/edit');
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
-        // dd($this->client->getResponse()->getContent());
-        $this->client->request(Request::METHOD_GET, '/tasks/1/edit');
-
-        self::assertResponseIsSuccessful();
 
         self::assertRouteSame('task_edit');
 
@@ -185,7 +152,7 @@ final class TaskActionTest extends WebTestCase
         $taskRepository = $this->client->getContainer()->get(TaskRepository::class);
 
         /** @var Task|null $task */
-        $task = $taskRepository->find('1');
+        $task = $taskRepository->find('11');
 
         self::assertNotNull($task);
         self::assertSame('Task modif', $task->getTitle());
