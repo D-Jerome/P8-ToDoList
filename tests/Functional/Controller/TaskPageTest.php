@@ -10,10 +10,6 @@ use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
-/**
- * @internal
- * @coversNothing
- */
 final class TaskPageTest extends WebTestCase
 {
     private null | KernelBrowser $client = null;

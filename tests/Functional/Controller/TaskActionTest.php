@@ -13,10 +13,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Webmozart\Assert\Assert;
 
-/**
- * @internal
- * @coversNothing
- */
 final class TaskActionTest extends WebTestCase
 {
     private null | KernelBrowser $client = null;
@@ -60,7 +56,7 @@ final class TaskActionTest extends WebTestCase
         ];
     }
 
-    public function testToggleTask(): void
+    public function testToggleTaskTest(): void
     {
         Assert::isInstanceOf($this->client, KernelBrowser::class);
         $this->client->loginUser($this->userTest);
@@ -85,6 +81,51 @@ final class TaskActionTest extends WebTestCase
 
         self::assertResponseIsSuccessful();
         // dd($this->client->getResponse()->getContent());
+        self::assertRouteSame('task_list');
+        $task = $taskRepository->findOneBy(['id' => $task->getId()]);
+        self::assertNotNull($task);
+
+        self::assertTrue($task->isDone());
+
+        $this->client->request(Request::METHOD_GET, "/tasks/{$taskDone->getId()}/toggle");
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
+
+        $this->client->followRedirect();
+
+        self::assertResponseIsSuccessful();
+
+        self::assertRouteSame('task_list_done');
+        $taskDone = $taskRepository->findOneBy(['id' => $taskDone->getId()]);
+
+        self::assertNotNull($taskDone);
+        self::assertFalse($taskDone->isDone());
+    }
+
+    public function testToggleTaskAdmin(): void
+    {
+        Assert::isInstanceOf($this->client, KernelBrowser::class);
+        $this->client->loginUser($this->userAdmin);
+        $this->client->request(Request::METHOD_GET, '/');
+
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        $this->client->clickLink('Consulter la liste des tâches à faire');
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
+
+        /**
+         * @var TaskRepository $taskRepository
+         */
+        $taskRepository = $this->client->getContainer()->get(TaskRepository::class);
+        $userId = $this->userAdmin->getId();
+        /** @var Task|null $task */
+        $task = $taskRepository->findOneBy(['user' => $userId, 'isDone' => false]);
+        $taskDone = $taskRepository->findOneBy(['user' => $userId, 'isDone' => true]);
+        $this->client->request(Request::METHOD_GET, "/tasks/{$task->getId()}/toggle");
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
+        $this->client->followRedirect();
+
+        self::assertResponseIsSuccessful();
+
         self::assertRouteSame('task_list');
         $task = $taskRepository->findOneBy(['id' => $task->getId()]);
         self::assertNotNull($task);

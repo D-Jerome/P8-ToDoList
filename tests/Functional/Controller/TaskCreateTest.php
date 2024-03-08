@@ -11,11 +11,8 @@ use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Webmozart\Assert\Assert;
 
-/**
- * @internal
- * @coversNothing
- */
 final class TaskCreateTest extends WebTestCase
 {
     private null | KernelBrowser $client = null;
@@ -61,6 +58,7 @@ final class TaskCreateTest extends WebTestCase
 
     public function testCreateTask(): void
     {
+        Assert::isInstanceOf($this->client, KernelBrowser::class);
         $this->client->loginUser($this->userTest);
 
         $this->client->request(Request::METHOD_GET, '/');
@@ -77,7 +75,7 @@ final class TaskCreateTest extends WebTestCase
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
         $this->client->followRedirect();
 
-        self::assertResponseIsSuccessful();
+        $this->assertSelectorTextContains('div.alert.alert-success', 'Superbe !');
 
         self::assertRouteSame('task_list');
 

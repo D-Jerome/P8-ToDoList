@@ -12,10 +12,6 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Webmozart\Assert\Assert;
 
-/**
- * @internal
- * @coversNothing
- */
 final class UserCreateTest extends WebTestCase
 {
     private null | KernelBrowser $client = null;
