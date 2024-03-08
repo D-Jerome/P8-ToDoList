@@ -4,13 +4,11 @@ declare(strict_types=1);
 
 namespace App\Tests\Functionnal\Controller;
 
-use Webmozart\Assert\Assert;
+use App\Repository\UserRepository;
+use Symfony\Bundle\FrameworkBundle\KernelBrowser;
+use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Bundle\FrameworkBundle\KernelBrowser;
-use Symfony\Component\HttpKernel\Profiler\Profile;
-use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
-use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
 
 /**
  * @internal
@@ -19,10 +17,16 @@ use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
 final class TaskPageTest extends WebTestCase
 {
     private null | KernelBrowser $client = null;
+    private $userTest;
+    private $userAdmin;
 
     protected function setUp(): void
     {
         $this->client = self::createClient();
+        $userRepository = self::getContainer()->get(UserRepository::class);
+        $this->userAdmin = $userRepository->findOneBy(['username' => 'admin']);
+        $userRepository = self::getContainer()->get(UserRepository::class);
+        $this->userTest = $userRepository->findOneBy(['username' => 'test']);
     }
 
     /**
@@ -41,23 +45,9 @@ final class TaskPageTest extends WebTestCase
 
     public function testShowTaskListToDo(): void
     {
-        Assert::isInstanceOf($this->client, KernelBrowser::class);
-        $this->client->request(Request::METHOD_GET, '/login');
+        $this->client->loginUser($this->userTest);
 
-        $this->client->submitForm('Se connecter', self::createFormData());
-
-        $this->client->enableProfiler();
-
-        if (($profile = $this->client->getProfile()) instanceof Profile) {
-            /** @var SecurityDataCollector $securityCollector */
-            $securityCollector = $profile->getCollector('security');
-            self::assertTrue($securityCollector->isAuthenticated());
-        }
-
-        $this->client->followRedirect();
-        self::assertResponseIsSuccessful();
-        // dd($this->client->getResponse()->getContent());
-        self::assertRouteSame('homepage');
+        $this->client->request(Request::METHOD_GET, '/');
 
         $this->client->clickLink('Consulter la liste des tâches à faire');
 
@@ -66,24 +56,8 @@ final class TaskPageTest extends WebTestCase
 
     public function testShowTaskListClosed(): void
     {
-        Assert::isInstanceOf($this->client, KernelBrowser::class);
-        $this->client->request(Request::METHOD_GET, '/login');
-
-        $this->client->submitForm('Se connecter', self::createFormData());
-
-        $this->client->enableProfiler();
-
-        if (($profile = $this->client->getProfile()) instanceof Profile) {
-            /** @var SecurityDataCollector $securityCollector */
-            $securityCollector = $profile->getCollector('security');
-            self::assertTrue($securityCollector->isAuthenticated());
-        }
-
-        $this->client->followRedirect();
-        self::assertResponseIsSuccessful();
-        // dd($this->client->getResponse()->getContent());
-        self::assertRouteSame('homepage');
-
+        $this->client->loginUser($this->userTest);
+        $this->client->request(Request::METHOD_GET, '/');
         $this->client->clickLink('Consulter la liste des tâches terminées');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
@@ -91,23 +65,8 @@ final class TaskPageTest extends WebTestCase
 
     public function testShowTaskToCreate(): void
     {
-        Assert::isInstanceOf($this->client, KernelBrowser::class);
-        $this->client->request(Request::METHOD_GET, '/login');
-
-        $this->client->submitForm('Se connecter', self::createFormData());
-
-        $this->client->enableProfiler();
-
-        if (($profile = $this->client->getProfile()) instanceof Profile) {
-            /** @var SecurityDataCollector $securityCollector */
-            $securityCollector = $profile->getCollector('security');
-            self::assertTrue($securityCollector->isAuthenticated());
-        }
-
-        $this->client->followRedirect();
-        self::assertResponseIsSuccessful();
-        // dd($this->client->getResponse()->getContent());
-        self::assertRouteSame('homepage');
+        $this->client->loginUser($this->userTest);
+        $this->client->request(Request::METHOD_GET, '/');
 
         $this->client->clickLink('Créer une nouvelle tâche');
 

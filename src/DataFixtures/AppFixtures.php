@@ -21,10 +21,23 @@ class AppFixtures extends Fixture
 
     public function load(ObjectManager $manager): void
     {
+        for ($i = 1; $i <= 5; ++$i) {
+            $task = new Task();
+            $task->setTitle("test {$i}");
+            $task->setContent("content {$i}");
+            $task->toggle(true);
+            $manager->persist($task);
+        }
+        for ($i = 6; $i <= 10; ++$i) {
+            $task = new Task();
+            $task->setTitle("test {$i}");
+            $task->setContent("content {$i}");
+            $manager->persist($task);
+        }
+
         $user = new User();
         $user->setUsername('test');
         $user->setPassword($this->hasher->hashPassword($user, 'password'));
-
         $user->setEmail('test@email.com');
         $manager->persist($user);
 
@@ -37,6 +50,29 @@ class AppFixtures extends Fixture
             $manager->persist($task);
         }
         for ($i = 6; $i <= 10; ++$i) {
+            $task = new Task();
+            $task->setTitle("test {$i}");
+            $task->setContent("content {$i}");
+            $task->setUser($user);
+            $manager->persist($task);
+        }
+
+        $user = new User();
+        $user->setUsername('admin');
+        $user->setPassword($this->hasher->hashPassword($user, 'password'));
+        $user->setEmail('admin@email.com');
+        $user->setRoles(['ROLE_ADMIN']);
+        $manager->persist($user);
+
+        for ($i = 11; $i <= 15; ++$i) {
+            $task = new Task();
+            $task->setTitle("test {$i}");
+            $task->setContent("content {$i}");
+            $task->setUser($user);
+            $task->toggle(true);
+            $manager->persist($task);
+        }
+        for ($i = 16; $i <= 20; ++$i) {
             $task = new Task();
             $task->setTitle("test {$i}");
             $task->setContent("content {$i}");

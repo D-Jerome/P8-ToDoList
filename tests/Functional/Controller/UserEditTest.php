@@ -19,10 +19,16 @@ use Webmozart\Assert\Assert;
 final class UserEditTest extends WebTestCase
 {
     private null | KernelBrowser $client = null;
+    private $userTest;
+    private $userAdmin;
 
     protected function setUp(): void
     {
         $this->client = self::createClient();
+        $userRepository = self::getContainer()->get(UserRepository::class);
+        $this->userAdmin = $userRepository->findOneBy(['username' => 'admin']);
+        $userRepository = self::getContainer()->get(UserRepository::class);
+        $this->userTest = $userRepository->findOneBy(['username' => 'test']);
     }
 
     /**
@@ -46,30 +52,34 @@ final class UserEditTest extends WebTestCase
     {
         return $overrideData + [
             'user[username]'         => 'testo',
-            'user[password][first]'  => 'password',
-            'user[password][second]' => 'password',
+            'user[password][first]'  => '!@#$1234QWERqwer',
+            'user[password][second]' => '!@#$1234QWERqwer',
             'user[email]'            => 'testo@test.email',
+            'user[roles]'            => 'ROLE_ADMIN',
         ];
     }
 
-    public function testShowUserEditPageFromUsers(): void
+    public function testAccessUserEditPageAdmin(): void
     {
         Assert::isInstanceOf($this->client, KernelBrowser::class);
-
+        $this->client->loginUser($this->userAdmin);
         $this->client->request(Request::METHOD_GET, '/users');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
+        self::assertRouteSame('user_list');
         $this->client->clickLink('Edit');
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
+        self::assertRouteSame('user_edit');
     }
 
     public function testEditUser(): void
     {
         Assert::isInstanceOf($this->client, KernelBrowser::class);
-
-        $this->client->request(Request::METHOD_GET, '/users/1/edit');
+        $this->client->loginUser($this->userTest);
+        $id = $this->userTest->getId();
+        $this->client->request(Request::METHOD_GET, "/users/{$id}/edit");
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
@@ -79,8 +89,6 @@ final class UserEditTest extends WebTestCase
 
         $this->client->followRedirect();
 
-        self::assertResponseIsSuccessful();
-        // dd($this->client->getResponse()->getContent());
         self::assertRouteSame('user_list');
 
         /**
@@ -88,9 +96,10 @@ final class UserEditTest extends WebTestCase
          */
         $userRepository = $this->client->getContainer()->get(UserRepository::class);
 
-        /** @var User|null $user */
-        $user = $userRepository->find('1');
+        /** @var User $user */
+        $user = $userRepository->findOneBy(['id'=> $id]);
         self::assertNotNull($user);
+
         self::assertSame('testo', $user->getUsername());
         self::assertSame('testo@test.email', $user->getEmail());
         self::assertNotNull($user->getPassword());
@@ -104,8 +113,9 @@ final class UserEditTest extends WebTestCase
     public function testUpdateUserWithErrors(array $formData): void
     {
         Assert::isInstanceOf($this->client, KernelBrowser::class);
-
-        $this->client->request(Request::METHOD_GET, '/users/1/edit');
+        $this->client->loginUser($this->userAdmin);
+        $id = $this->userAdmin->getId();
+        $this->client->request(Request::METHOD_GET, "/users/{$id}/edit");
 
         self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
@@ -116,7 +126,7 @@ final class UserEditTest extends WebTestCase
         if ('fail.fail.fail' === $formData['user[email]']) {
             self::assertAnySelectorTextContains('ul li', 'Le format');
         } else {
-            if ('password' !== $formData['user[password][second]']) {
+            if ('!@#$1234QWERqwer' !== $formData['user[password][second]']) {
                 self::assertAnySelectorTextContains('ul li', 'Les deux mots de passe doivent correspondre.');
             } else {
                 self::assertAnySelectorTextContains('ul li', 'Vous devez');

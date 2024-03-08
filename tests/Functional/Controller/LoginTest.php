@@ -4,6 +4,7 @@ declare(strict_types=1);
 
 namespace App\Tests\Functionnal;
 
+use App\Repository\UserRepository;
 use Symfony\Bundle\FrameworkBundle\KernelBrowser;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase;
 use Symfony\Bundle\SecurityBundle\DataCollector\SecurityDataCollector;
@@ -19,10 +20,16 @@ use Webmozart\Assert\Assert;
 final class LoginTest extends WebTestCase
 {
     private null | KernelBrowser $client = null;
+    private $userTest;
+    private $userAdmin;
 
     protected function setUp(): void
     {
         $this->client = self::createClient();
+        $userRepository = self::getContainer()->get(UserRepository::class);
+        $this->userAdmin = $userRepository->findOneBy(['username' => 'admin']);
+        $userRepository = self::getContainer()->get(UserRepository::class);
+        $this->userTest = $userRepository->findOneBy(['username' => 'test']);
     }
 
     public function testShouldAuthenticate(): void
@@ -31,7 +38,7 @@ final class LoginTest extends WebTestCase
         Assert::isInstanceOf($this->client, KernelBrowser::class);
         $this->client->request(Request::METHOD_GET, '/login');
 
-        $this->client->submitForm('Se connecter', self::createFormData());
+        $this->client->submitForm('Se connecter', self::createFormDataUser());
 
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
@@ -46,29 +53,40 @@ final class LoginTest extends WebTestCase
         $this->client->followRedirect();
 
         self::assertResponseIsSuccessful();
-        // dd($client->getResponse()->getContent());
+        // dd($this->client->getResponse()->getContent());
         self::assertRouteSame('homepage');
     }
 
-    /**
-     * @return \ArrayIterator<int,User>
-     */
     public static function provideShouldShowErrorsCases(): iterable
     {
-        yield 'bad username' => [self::createFormData(['_username' => 'fail'])];
-        yield 'bad password' => [self::createFormData(['_password' => 'fail'])];
+        yield 'bad username' => [self::createFormDataUser(['_username' => 'fail'])];
+        yield 'bad password' => [self::createFormDataUser(['_password' => 'fail'])];
     }
 
     /**
-     * Undocumented function
+     * login Data
      *
      * @param  array<string,string> $overrideData
      * @return array<string,string>
      */
-    private static function createFormData(array $overrideData = []): array
+    private static function createFormDataUser(array $overrideData = []): array
     {
         return $overrideData + [
             '_username' => 'test',
+            '_password' => 'password',
+        ];
+    }
+
+    /**
+     * login Data
+     *
+     * @param  array<string,string> $overrideData
+     * @return array<string,string>
+     */
+    private static function createFormDataAdmin(array $overrideData = []): array
+    {
+        return $overrideData + [
+            '_username' => 'admin',
             '_password' => 'password',
         ];
     }
@@ -109,7 +127,7 @@ final class LoginTest extends WebTestCase
 
         $this->client->request(Request::METHOD_GET, '/login');
 
-        $this->client->submitForm('Se connecter', self::createFormData());
+        $this->client->submitForm('Se connecter', self::createFormDataUser());
 
         self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
 
@@ -128,38 +146,23 @@ final class LoginTest extends WebTestCase
         self::assertRouteSame('homepage');
 
         $this->client->request(Request::METHOD_GET, '/logout');
-
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
         $this->client->followRedirect();
-
         self::assertRouteSame('homepage');
     }
 
     public function testLogout(): void
     {
         Assert::isInstanceOf($this->client, KernelBrowser::class);
+        $this->client->loginUser($this->userTest);
+        $this->client->request(Request::METHOD_GET, '/');
 
-        $this->client->request(Request::METHOD_GET, '/login');
+        self::assertResponseStatusCodeSame(Response::HTTP_OK);
 
-        $this->client->submitForm('Se connecter', self::createFormData());
-
-        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
-
-        $this->client->enableProfiler();
-
-        if (($profile = $this->client->getProfile()) instanceof Profile) {
-            /** @var SecurityDataCollector $securityCollector */
-            $securityCollector = $profile->getCollector('security');
-            self::assertTrue($securityCollector->isAuthenticated());
-        }
-
-        $this->client->followRedirect();
-
-        self::assertResponseIsSuccessful();
-        // dd($client->getResponse()->getContent());
         self::assertRouteSame('homepage');
 
         $this->client->clickLink('Se déconnecter');
-
+        self::assertResponseStatusCodeSame(Response::HTTP_FOUND);
         $this->client->followRedirect();
 
         self::assertRouteSame('homepage');
