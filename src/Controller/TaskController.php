@@ -14,6 +14,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Security\Http\Attribute\CurrentUser;
+use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class TaskController extends AbstractController
 {
@@ -62,6 +63,7 @@ class TaskController extends AbstractController
     }
 
     #[Route(path: '/tasks/{id}/edit', name: 'task_edit')]
+    #[IsGranted('TASK_MODIFY', subject: 'task')]
     public function edit(Task $task, Request $request, EntityManagerInterface $em): Response
     {
         $form = $this->createForm(TaskType::class, $task);
@@ -83,6 +85,7 @@ class TaskController extends AbstractController
     }
 
     #[Route(path: '/tasks/{id}/toggle', name: 'task_toggle')]
+    #[IsGranted('TASK_MODIFY', subject: 'task')]
     public function toggleTask(Task $task, EntityManagerInterface $em): Response
     {
         $task->toggle(!$task->isDone());
@@ -98,10 +101,11 @@ class TaskController extends AbstractController
         return $this->redirectToRoute('task_list_done');
     }
 
-    #[Route(path: '/tasks/{id}/delete', name: 'task_delete')]
+    #[Route(path: '/tasks/{id}/delete', name: 'task_delete')] 
+    #[IsGranted('TASK_DELETE', subject: 'task')]
     public function deleteTask(Task $task, EntityManagerInterface $em): Response
     {
-        $this->denyAccessUnlessGranted('TASK_DELETE', $task);
+        // $this->denyAccessUnlessGranted('TASK_DELETE', $task);
 
         $em->remove($task);
         $em->flush();
