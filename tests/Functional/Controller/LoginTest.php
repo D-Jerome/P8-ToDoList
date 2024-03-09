@@ -15,8 +15,7 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
- * @coversNothing
- */
+ * @covers */
 final class LoginTest extends WebTestCase
 {
     private null | KernelBrowser $client = null;
