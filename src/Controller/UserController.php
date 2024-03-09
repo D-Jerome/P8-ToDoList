@@ -18,6 +18,9 @@ use Webmozart\Assert\Assert;
 
 class UserController extends AbstractController
 {
+    /**
+     * Display the list of all app users
+     */
     #[IsGranted('ROLE_ADMIN', message: 'Accés non autorisé')]
     #[Route(path: '/users', name: 'user_list')]
     public function list(UserRepository $userRepository): Response
@@ -25,6 +28,9 @@ class UserController extends AbstractController
         return $this->render('user/list.html.twig', ['users' => $userRepository->findAll()]);
     }
 
+    /**
+     * Manage the form & pages to create a user
+     */
     #[Route(path: '/users/create', name: 'user_create')]
     public function create(
         Request $request,
@@ -53,6 +59,9 @@ class UserController extends AbstractController
         return $this->render('user/create.html.twig', ['form' => $form->createView()]);
     }
 
+    /**
+     * Manage the form & pages to edit a user profile
+     */
     #[Route(path: '/users/{id}/edit', name: 'user_edit')]
     public function edit(
         User $user,

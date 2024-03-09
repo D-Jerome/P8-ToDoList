@@ -18,6 +18,12 @@ use Symfony\Component\Security\Http\Attribute\IsGranted;
 
 class TaskController extends AbstractController
 {
+    /**
+     * Display the list of tasks that must be done
+     *
+     * @param TaskRepository $taskRepository param
+     * @param User           $connectedUser
+     */
     #[Route(path: '/tasks', name: 'task_list')]
     public function list(TaskRepository $taskRepository, #[CurrentUser] User $connectedUser): Response
     {
@@ -28,6 +34,12 @@ class TaskController extends AbstractController
         return $this->render('task/list.html.twig', ['tasks' => $taskRepository->findBy(['user' => $connectedUser, 'isDone' => false])]);
     }
 
+    /**
+     * Display the list of tasks that have been completed
+     *
+     * @param TaskRepository $taskRepository param
+     * @param User           $connectedUser
+     */
     #[Route(path: '/tasks/done', name: 'task_list_done')]
     public function listDone(TaskRepository $taskRepository, #[CurrentUser] User $connectedUser): Response
     {
@@ -38,6 +50,11 @@ class TaskController extends AbstractController
         return $this->render('task/list.html.twig', ['tasks' => $taskRepository->findBy(['user' => $connectedUser, 'isDone' => true])]);
     }
 
+    /**
+     * Manage the form & pages to create a task
+     *
+     * @param User $connectedUser
+     */
     #[Route(path: '/tasks/create', name: 'task_create')]
     public function create(
         Request $request,
@@ -62,6 +79,9 @@ class TaskController extends AbstractController
         return $this->render('task/create.html.twig', ['form' => $form->createView()]);
     }
 
+    /**
+     * Manage the form & pages to edit a task
+     */
     #[Route(path: '/tasks/{id}/edit', name: 'task_edit')]
     #[IsGranted('TASK_MODIFY', subject: 'task')]
     public function edit(Task $task, Request $request, EntityManagerInterface $em): Response
@@ -84,6 +104,9 @@ class TaskController extends AbstractController
         ]);
     }
 
+    /**
+     * Manage the feature to change task status (done or not)
+     */
     #[Route(path: '/tasks/{id}/toggle', name: 'task_toggle')]
     #[IsGranted('TASK_MODIFY', subject: 'task')]
     public function toggleTask(Task $task, EntityManagerInterface $em): Response
@@ -101,6 +124,9 @@ class TaskController extends AbstractController
         return $this->redirectToRoute('task_list_done');
     }
 
+    /**
+     * Manage the feature to delete a task
+     */
     #[Route(path: '/tasks/{id}/delete', name: 'task_delete')]
     #[IsGranted('TASK_DELETE', subject: 'task')]
     public function deleteTask(Task $task, EntityManagerInterface $em): Response
