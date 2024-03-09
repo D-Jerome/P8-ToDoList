@@ -15,16 +15,11 @@ use Webmozart\Assert\Assert;
 final class UserCreateTest extends WebTestCase
 {
     private null | KernelBrowser $client = null;
-    private $userTest;
-    private $userAdmin;
 
     protected function setUp(): void
     {
         $this->client = self::createClient();
         $userRepository = self::getContainer()->get(UserRepository::class);
-        $this->userAdmin = $userRepository->findOneBy(['username' => 'admin']);
-        $userRepository = self::getContainer()->get(UserRepository::class);
-        $this->userTest = $userRepository->findOneBy(['username' => 'test']);
     }
 
     /**
