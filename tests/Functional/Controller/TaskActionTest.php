@@ -28,19 +28,7 @@ final class TaskActionTest extends WebTestCase
         $this->userTest = $userRepository->findOneBy(['username' => 'test']);
     }
 
-    /**
-     * Undocumented function
-     *
-     * @param  array<string,string> $overrideData
-     * @return array<string,string>
-     */
-    private static function userFormData(array $overrideData = []): array
-    {
-        return $overrideData + [
-            '_username' => 'test',
-            '_password' => 'password',
-        ];
-    }
+   
 
     /**
      * Undocumented function

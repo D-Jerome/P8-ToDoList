@@ -17,30 +17,17 @@ final class TaskCreateTest extends WebTestCase
 {
     private null | KernelBrowser $client = null;
     private $userTest;
-    private $userAdmin;
+
 
     protected function setUp(): void
     {
         $this->client = self::createClient();
-        $userRepository = self::getContainer()->get(UserRepository::class);
-        $this->userAdmin = $userRepository->findOneBy(['username' => 'admin']);
+
         $userRepository = self::getContainer()->get(UserRepository::class);
         $this->userTest = $userRepository->findOneBy(['username' => 'test']);
     }
 
-    /**
-     * Undocumented function
-     *
-     * @param  array<string,string> $overrideData
-     * @return array<string,string>
-     */
-    private static function userFormData(array $overrideData = []): array
-    {
-        return $overrideData + [
-            '_username' => 'test',
-            '_password' => 'password',
-        ];
-    }
+
 
     /**
      * Undocumented function

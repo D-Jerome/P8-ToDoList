@@ -15,19 +15,16 @@ use Webmozart\Assert\Assert;
 
 /**
  * @internal
- * @coversNothing
- */
+ * @covers */
 final class LoginTest extends WebTestCase
 {
     private null | KernelBrowser $client = null;
     private $userTest;
-    private $userAdmin;
 
     protected function setUp(): void
     {
         $this->client = self::createClient();
-        $userRepository = self::getContainer()->get(UserRepository::class);
-        $this->userAdmin = $userRepository->findOneBy(['username' => 'admin']);
+
         $userRepository = self::getContainer()->get(UserRepository::class);
         $this->userTest = $userRepository->findOneBy(['username' => 'test']);
     }
@@ -73,20 +70,6 @@ final class LoginTest extends WebTestCase
     {
         return $overrideData + [
             '_username' => 'test',
-            '_password' => 'password',
-        ];
-    }
-
-    /**
-     * login Data
-     *
-     * @param  array<string,string> $overrideData
-     * @return array<string,string>
-     */
-    private static function createFormDataAdmin(array $overrideData = []): array
-    {
-        return $overrideData + [
-            '_username' => 'admin',
             '_password' => 'password',
         ];
     }
