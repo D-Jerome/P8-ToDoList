@@ -59,7 +59,7 @@ php bin/console doctrine:fixtures:load
 
 ### Run the application
 
-Launch the Apache/Php runtime environment by using :
+Launch symfony server by using :
 
 ```shell
 symfony server:start
@@ -79,7 +79,7 @@ Default password for the user is `password`
 
 ToDoList has continuous support !
 
-[![Project Maintained](https://img.shields.io/maintenance/yes/2021.svg?label=Maintained)](https://github.com/kevinmulot/OC-P8-Todolist)
+[![Project Maintained](https://img.shields.io/maintenance/yes/2024.svg?label=Maintained)](https://github.com/D-Jerome/P8-ToDoList)
 [![GitHub Last Commit](https://img.shields.io/github/last-commit/D-Jerome/P8-ToDoList.svg?label=Last+Commit)](https://github.com/D-Jerome/P8-ToDoList/commits/main)
 
 ## Issues
