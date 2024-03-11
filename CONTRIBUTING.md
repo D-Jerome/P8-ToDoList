@@ -62,7 +62,7 @@ If your pull request conforms to the project's contribution recommendations, you
 ## The Best Practices
 
 -   Symfony Best Practices <https://symfony.com/doc/current/best_practices.html#creating-the-project>
--   Doctrine Best Practices <https://www.doctrine-project.org/projects/doctrine-orm/en/3.0/reference/best-practices.html>
+-   Doctrine Best Practices <https://www.doctrine-project.org/projects/doctrine-orm/en/current/reference/best-practices.html>
 
 ## Tests
 
