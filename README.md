@@ -2,10 +2,8 @@
 
 My eighth OpenClassRooms Project with PHP/Symphony.
 
-[![Maintainability](https://api.codeclimate.com/v1/badges/ee13f5da60e8aefe708f/maintainability)](https://codeclimate.com/github/kevinmulot/OC-P8-Todolist/maintainability)
-[![Codacy Badge](https://app.codacy.com/project/badge/Grade/4bb2a9a45a5041a084d04b77d660116d)](https://www.codacy.com/gh/kevinmulot/OC-P8-Todolist/dashboard?utm_source=github.com&utm_medium=referral&utm_content=kevinmulot/OC-P8-Todolist&utm_campaign=Badge_Grade)
-![OenClassRooms](https://img.shields.io/badge/OpenClassRooms-DA_PHP/SF-blue.svg)
-![Project](https://img.shields.io/badge/Project-8-blue.svg)
+[![Maintainability](https://api.codeclimate.com/v1/badges/1273edde5684bf58768e/maintainability)](https://codeclimate.com/github/D-Jerome/P8-ToDoList/maintainability)
+[![Codacy Badge](https://app.codacy.com/project/badge/Grade/38ef0ae2569a40408652159623f3690c)](https://app.codacy.com/gh/D-Jerome/P8-ToDoList/dashboard?utm_source=gh&utm_medium=referral&utm_content=&utm_campaign=Badge_grade)
 
 ---
 
