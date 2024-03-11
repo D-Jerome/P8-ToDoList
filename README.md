@@ -62,7 +62,7 @@ php bin/console doctrine:fixtures:load
 Launch the Apache/Php runtime environment by using :
 
 ```shell
-php bin/console server:run
+symfony server:start
 ```
 
 ### Default Admin credentials
